@@ -2,7 +2,7 @@ from flask_wtf import FlaskForm
 from wtforms import (PasswordField,
                      BooleanField,
                      SubmitField,
-                     EmailField,
+                     TimeField,
                      StringField)
 from wtforms.validators import DataRequired
 

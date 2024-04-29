@@ -1,3 +1,5 @@
+import secrets
+import requests
 from flask import Flask, session
 from flask import render_template, redirect, request, make_response, jsonify
 from flask_login import (LoginManager,
@@ -19,18 +21,21 @@ from data.bot_resources import LobbyResource
 
 
 app = Flask(__name__)
-app.config["SECRET_KEY"] = "arstoienqwfp;yulfqwpoiesvk"
+app.config["SECRET_KEY"] = "DEV"
+# prod:
+# app.config["SECRET_KEY"] = secrets.token_urlsafe(32)
 login_manager = LoginManager()
 login_manager.init_app(app)
 
 api = Api(app)
-api.add_resource(LobbyResource, "/api/lobby")
+api.add_resource(LobbyResource, "/api/lobby/<int:lobby_id>")
 
 
 @login_manager.user_loader
 def load_user(user_id):
     db_sess = db_session.create_session()
-    return db_sess.query(User).get(user_id)
+    return db_sess.get(User, user_id)
+    
 
 
 @app.route("/")
@@ -92,14 +97,8 @@ def logout():
 def new_room():
     form = RoomForm()
     if form.validate_on_submit():
-        db_sess = db_session.create_session()
-        room = Room(name=form.name.data)
-        db_sess.add(room)
-        db_sess.commit()
-        current_user.lobby.rooms += ";{}".format(room.id)
-        db_sess.add(current_user.lobby)
-        db_sess.commit()
-        db_sess.close()
+        room = {"name": form.name.data, "timer": form.timelimit.data}
+        requests.post(f"http://127.0.0.1:8080/api/lobby/{current_user.id}", room)
         return redirect("/lobby")
         
     return render_template("roomform.html", form=form, title="Новая комната")
@@ -108,7 +107,9 @@ def new_room():
 @app.route("/lobby")
 def loddy():
     if current_user.is_authenticated:
-        return render_template("lobby.html", title="Лобби")
+        response = requests.get(f"http://127.0.0.1:8080/api/lobby/{current_user.lobby_id}").json()
+        
+        return render_template("lobby.html", title="Лобби", rooms=response["rooms"][::-1])
     return redirect("/login")
 
 

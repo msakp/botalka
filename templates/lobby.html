@@ -7,5 +7,16 @@
 </div>
 <br>
 <h1>Комнаты</h1>
+{% for room in rooms %}
+<div class="col-md6 border rounded">
+    <h2>
+        {{room["name"]}}
+    </h2>
+    <div>
+        {{room["timer"]}} minutes more
+    </div>
+</div>
+<br>
+{% endfor %}
 
 {% endblock %}

@@ -8,10 +8,7 @@ class Lobby(SqlAlchemyBase, SerializerMixin):
 
     id = sqlalchemy.Column(sqlalchemy.Integer, 
                            primary_key=True, autoincrement=True)
-    
-    rooms = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     user = orm.relationship("User")
-    # list of room_ids like "1, 2, 3, 4"
 
     def __repr__(self):
         return "<Lobby> {}".format(self.id)

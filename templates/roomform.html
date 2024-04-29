@@ -13,6 +13,16 @@
                 </div>
             {% endfor %}
         </p>
+        <p>
+            {{ form.timelimit.label}}
+            {{ form.timelimit(class="form-control")}}
+            
+            {% for error in form.timelimit.errors %}
+                <div class="alert alert-danger", role="alert">
+                    {{ error }}
+                </div>
+            {% endfor %}
+        </p>
         <p>{{ form.submit(type="submit", class="btn btn-primary") }}</p>
         <div>{{ message }}</div>
     </form>

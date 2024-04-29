@@ -28,7 +28,7 @@ class User(SqlAlchemyBase, UserMixin, SerializerMixin):
         return check_password_hash(self.hashed_password, password)
 
     def create_lobby(self, db_session):
-        lobby = Lobby(rooms="")
+        lobby = Lobby()
         db_session.add(lobby)
         db_session.commit()
         return lobby.id
