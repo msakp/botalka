@@ -17,7 +17,7 @@ from forms.register import RegisterForm
 from forms.roomform import RoomForm
 
 from flask_restful import reqparse, abort, Api, Resource
-from data.bot_resources import LobbyResource
+from data.bot_resources import LobbyResource, RoomResource
 
 
 app = Flask(__name__)
@@ -29,6 +29,7 @@ login_manager.init_app(app)
 
 api = Api(app)
 api.add_resource(LobbyResource, "/api/lobby/<int:lobby_id>")
+api.add_resource(RoomResource, "/api/lobby/<int:lobby_id>/room/<int:room_id>")
 
 
 @login_manager.user_loader
@@ -108,10 +109,18 @@ def new_room():
 def loddy():
     if current_user.is_authenticated:
         response = requests.get(f"http://127.0.0.1:8080/api/lobby/{current_user.lobby_id}").json()
-        
+                    
         return render_template("lobby.html", title="Лобби", rooms=response["rooms"][::-1])
     return redirect("/login")
 
+
+@app.route("/lobby/<int:room_id>")
+def room(room_id):
+    if current_user.is_authenticated:
+        response = requests.get(f"http://127.0.0.1:8080/api/lobby/{current_user.lobby_id}/room/{room_id}").json()
+        current_room = response["room"]
+        return render_template("room.html", title=current_room["name"], room_name=current_room["name"], room_timer=current_room["timer"])
+    return redirect("/login")
 
 def main():
     db_session.global_init("db/botalka.db")

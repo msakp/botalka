@@ -21,7 +21,7 @@ class LobbyResource(Resource):
         db_sess = db_session.create_session()
         rooms = db_sess.query(Room).filter(Room.lobby_id == lobby_id).all()
         db_sess.close()
-        return jsonify({"rooms": [room.to_dict(only=("name", "timer")) for room in rooms]})
+        return jsonify({"rooms": [room.to_dict(only=("id", "name", "timer")) for room in rooms]})
     
     def post(self, lobby_id):
         args = parser.parse_args()
@@ -34,3 +34,10 @@ class LobbyResource(Resource):
         db_sess.close()
         return jsonify({"room": info})
 
+
+class RoomResource(Resource):
+    def get(self, lobby_id, room_id):
+        db_sess = db_session.create_session()
+        room = db_sess.query(Room).filter(Room.id == room_id).first()
+        info = room.to_dict(only=("name", "timer"))
+        return jsonify({"room": info})
